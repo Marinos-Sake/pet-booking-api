@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table(name = "pets")
-public class Pet {
+public class Pet extends AbstractEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

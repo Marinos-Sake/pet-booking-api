@@ -6,6 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * This table is used to store uploaded identity documents for verifying a person's information.
+ * It helps in association a scanned ID (e.g. identity card) with each person for authentication purposes.
+ */
+
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

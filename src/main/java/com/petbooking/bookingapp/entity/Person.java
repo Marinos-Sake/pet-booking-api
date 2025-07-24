@@ -41,6 +41,10 @@ public class Person  extends AbstractEntity{
     @Column(name = "identity_number", nullable = false, unique = true, length = 9)
     private String identityNumber;
 
+    /**
+     * The uploaded identity document used to verify this person's identity
+     */
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "identity_number_file_id")
     private Attachment identityNumberFile;

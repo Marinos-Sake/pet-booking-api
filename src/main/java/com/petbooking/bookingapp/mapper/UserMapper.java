@@ -67,7 +67,7 @@ public class UserMapper {
             personDTO.setPlaceOfBirth(person.getPlaceOfBirth());
             dto.setPerson(personDTO);
         }
-
+//
         return dto;
     }
 }

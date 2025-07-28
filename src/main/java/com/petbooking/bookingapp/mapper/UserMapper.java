@@ -22,7 +22,7 @@ public class UserMapper {
 
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole());
         user.setIsActive(dto.getIsActive());
 
@@ -45,7 +45,7 @@ public class UserMapper {
 
     }
 
-    public UserReadOnlyDTO mapToUserReadOnlyDTO(User user) {
+    public UserReadOnlyDTO mapToReadOnlyDTO(User user) {
         if (user == null) return null;
 
         UserReadOnlyDTO dto = new UserReadOnlyDTO();

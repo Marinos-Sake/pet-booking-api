@@ -1,5 +1,6 @@
 package com.petbooking.bookingapp.dto;
 
+import com.petbooking.bookingapp.core.enums.RoomType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class RoomInsertDTO {
     private String name;
 
     @NotBlank(message = "Room type is required")
-    private String type;
+    private RoomType type;
 
     @NotNull(message = "Capacity is required")
     private Integer capacity;

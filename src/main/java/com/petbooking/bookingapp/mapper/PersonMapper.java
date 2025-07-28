@@ -25,7 +25,7 @@ public class PersonMapper {
 
     }
 
-    public PersonReadOnlyDTO mapToPersonReadOnlyDTO(Person person) {
+    public PersonReadOnlyDTO mapToReadOnlyDTO(Person person) {
 
         if (person == null) return null;
 

@@ -25,15 +25,15 @@ public class PetMapper {
     }
 
 
-    public PetReadOnlyDTO mapToPetReadOnlyDTO(Pet pet) {
+    public PetReadOnlyDTO mapToReadOnlyDTO(Pet pet) {
         if (pet == null) return null;
 
         PetReadOnlyDTO dto = new PetReadOnlyDTO();
-        dto.setId(dto.getId());
-        dto.setType(dto.getType());
-        dto.setGender(dto.getGender());
-        dto.setName(dto.getName());
-        dto.setWeight(dto.getWeight());
+        dto.setId(pet.getId());
+        dto.setType(pet.getType());
+        dto.setGender(pet.getGender());
+        dto.setName(pet.getName());
+        dto.setWeight(pet.getWeight());
 
         // Optional: Owner’s full name (if available)
         if(pet.getOwner() != null) {

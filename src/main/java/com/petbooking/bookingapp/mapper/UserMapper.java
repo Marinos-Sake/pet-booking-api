@@ -70,4 +70,20 @@ public class UserMapper {
 //
         return dto;
     }
+
+
+    public void updateUserEntityFromDTO(UserInsertDTO dto, User user) {
+        user.setUsername(dto.getUsername());
+
+        if (dto.getPerson() != null && user.getPerson() != null) {
+            user.getPerson().setName(dto.getPerson().getName());
+            user.getPerson().setSurname(dto.getPerson().getSurname());
+            user.getPerson().setGender(dto.getPerson().getGender());
+            user.getPerson().setDateOfBirth(dto.getPerson().getDateOfBirth());
+            user.getPerson().setIdentityNumber(dto.getPerson().getIdentityNumber());
+            user.getPerson().setPlaceOfBirth(dto.getPerson().getPlaceOfBirth());
+            user.getPerson().setFatherName(dto.getPerson().getFatherName());
+        }
+    }
+
 }

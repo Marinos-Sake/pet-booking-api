@@ -44,5 +44,17 @@ public class PersonMapper {
 
     }
 
+    public void updatePersonEntityFromDTO(PersonInsertDTO dto, Person person) {
+        if (dto == null || person == null) return;
+
+        person.setName(dto.getName());
+        person.setSurname(dto.getSurname());
+        person.setDateOfBirth(dto.getDateOfBirth());
+        person.setPlaceOfBirth(dto.getPlaceOfBirth());
+        person.setFatherName(dto.getFatherName());
+        person.setIdentityNumber(dto.getIdentityNumber());
+        person.setGender(dto.getGender());
+    }
+
 
 }

@@ -21,7 +21,7 @@ public class UserInsertDTO {
     private String password;
 
     @NotNull(message = "Role is required")
-    private Role role;
+    private Role role = Role.USER;
 
     private Boolean isActive = true;
 

@@ -45,5 +45,15 @@ public class PetMapper {
         return dto;
     }
 
+    public void updatePetEntityFromDTO(PetInsertDTO dto, Pet pet) {
+        if (dto == null || pet == null) return;
+
+        pet.setType(dto.getPetType());
+        pet.setGender(dto.getGender());
+        pet.setName(dto.getName());
+        pet.setWeight(dto.getWeight());
+        pet.setBirthDate(dto.getBirthDate());
+    }
+
 
 }

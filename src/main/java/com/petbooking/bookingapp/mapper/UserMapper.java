@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
 
     private final PasswordEncoder passwordEncoder;
+    private final PersonMapper personMapper;
 
     public User mapToUserEntity(UserInsertDTO dto) {
 
@@ -27,19 +28,7 @@ public class UserMapper {
         user.setIsActive(dto.getIsActive());
 
         //Nested Person
-        PersonInsertDTO personInsertDTO = dto.getPerson();
-        if (personInsertDTO != null) {
-            Person person = new Person();
-            person.setName(personInsertDTO.getName());
-            person.setSurname(personInsertDTO.getSurname());
-            person.setDateOfBirth(personInsertDTO.getDateOfBirth());
-            person.setPlaceOfBirth(personInsertDTO.getPlaceOfBirth());
-            person.setFatherName(personInsertDTO.getFatherName());
-            person.setIdentityNumber(personInsertDTO.getIdentityNumber());
-            person.setGender(personInsertDTO.getGender());
-
-            user.setPerson(person);
-        }
+        user.setPerson(personMapper.mapToPersonEntity(dto.getPerson()));
 
         return user;
 
@@ -55,18 +44,7 @@ public class UserMapper {
         dto.setIsActive(user.getIsActive());
 
         // Nested person
-        Person person = user.getPerson();
-        if (person != null) {
-            PersonReadOnlyDTO personDTO = new PersonReadOnlyDTO();
-            personDTO.setName(person.getName());
-            personDTO.setSurname(person.getSurname());
-            personDTO.setGender(person.getGender());
-            personDTO.setDateOfBirth(person.getDateOfBirth());
-            personDTO.setIdentityNumber(person.getIdentityNumber());
-            personDTO.setFatherName(person.getFatherName());
-            personDTO.setPlaceOfBirth(person.getPlaceOfBirth());
-            dto.setPerson(personDTO);
-        }
+        dto.setPerson(personMapper.mapToReadOnlyDTO(user.getPerson()));
 //
         return dto;
     }
@@ -76,13 +54,7 @@ public class UserMapper {
         user.setUsername(dto.getUsername());
 
         if (dto.getPerson() != null && user.getPerson() != null) {
-            user.getPerson().setName(dto.getPerson().getName());
-            user.getPerson().setSurname(dto.getPerson().getSurname());
-            user.getPerson().setGender(dto.getPerson().getGender());
-            user.getPerson().setDateOfBirth(dto.getPerson().getDateOfBirth());
-            user.getPerson().setIdentityNumber(dto.getPerson().getIdentityNumber());
-            user.getPerson().setPlaceOfBirth(dto.getPerson().getPlaceOfBirth());
-            user.getPerson().setFatherName(dto.getPerson().getFatherName());
+            personMapper.updatePersonEntityFromDTO(dto.getPerson(), user.getPerson());
         }
     }
 

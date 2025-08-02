@@ -50,7 +50,7 @@ public class UserService {
         return userMapper.mapToReadOnlyDTO(savedUser);
     }
 
-    @Transactional
+
     public UserReadOnlyDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppObjectNotFoundException(
@@ -62,7 +62,7 @@ public class UserService {
     }
 
 
-    @Transactional
+
     public List<UserReadOnlyDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::mapToReadOnlyDTO)

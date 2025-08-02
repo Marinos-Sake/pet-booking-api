@@ -5,21 +5,20 @@ import com.petbooking.bookingapp.dto.RoomReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Room;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-
 @Component
 public class RoomMapper {
 
-    public Room mapToRoomEntity(RoomInsertDTO dto, BigDecimal pricePerNight) {
-        if (dto == null || pricePerNight == null) return null;
+    public Room mapToRoomEntity(RoomInsertDTO dto) {
+        if (dto == null) return null;
 
         Room room = new Room();
         room.setName(dto.getName());
         room.setType(dto.getType());
         room.setCapacity(dto.getCapacity());
         room.setDescription(dto.getDescription());
-        room.setIsAvailable(dto.getIsAvailable());
-        room.setPricePerNight(pricePerNight);
+        room.setPricePerNight(dto.getPricePerNight());
+        room.setIsAvailable(dto.getIsAvailable() != null ? dto.getIsAvailable() : true);
+
 
         return room;
     }

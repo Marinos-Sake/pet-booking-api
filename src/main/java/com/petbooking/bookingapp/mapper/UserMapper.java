@@ -52,6 +52,7 @@ public class UserMapper {
 
     public void updateUserEntityFromDTO(UserInsertDTO dto, User user) {
         user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
 
         if (dto.getPerson() != null && user.getPerson() != null) {
             personMapper.updatePersonEntityFromDTO(dto.getPerson(), user.getPerson());

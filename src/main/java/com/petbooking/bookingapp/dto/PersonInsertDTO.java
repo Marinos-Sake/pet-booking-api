@@ -21,7 +21,7 @@ public class PersonInsertDTO {
     @NotBlank(message = "Surname is required")
     private String surname;
 
-    @NotBlank(message = "Date of Birth is required")
+    @NotNull(message = "Date of Birth is required")
     private LocalDate dateOfBirth;
 
     @NotBlank(message = "Place of Birth is required")

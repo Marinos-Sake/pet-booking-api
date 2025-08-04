@@ -78,6 +78,17 @@ public class ErrorHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
+    @ExceptionHandler(AppInvalidInputException.class)
+    public ResponseEntity<ResponseMessageDTO> handleInvalidInput(AppInvalidInputException ex) {
+        ResponseMessageDTO response = new ResponseMessageDTO(
+                LocalDateTime.now(),
+                ex.getCode(),
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseMessageDTO> handleUnexpected(Exception ex) {

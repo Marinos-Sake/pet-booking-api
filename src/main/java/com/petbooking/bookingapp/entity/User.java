@@ -78,7 +78,13 @@ public class User extends AbstractEntity implements UserDetails {
     }
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();

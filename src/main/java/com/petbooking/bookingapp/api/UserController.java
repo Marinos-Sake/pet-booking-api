@@ -3,10 +3,15 @@ package com.petbooking.bookingapp.api;
 
 import com.petbooking.bookingapp.dto.UserInsertDTO;
 import com.petbooking.bookingapp.dto.UserReadOnlyDTO;
+import com.petbooking.bookingapp.entity.User;
+import com.petbooking.bookingapp.mapper.UserMapper;
+import com.petbooking.bookingapp.security.SecurityUtil;
 import com.petbooking.bookingapp.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final UserMapper userMapper;
     private final UserService userService;
 
     @PostMapping
@@ -47,4 +53,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserReadOnlyDTO> getMyProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userMapper.mapToReadOnlyDTO(user));
+    }
+
+
 }

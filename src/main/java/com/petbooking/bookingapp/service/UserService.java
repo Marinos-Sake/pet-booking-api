@@ -1,7 +1,7 @@
 package com.petbooking.bookingapp.service;
 
 
-import com.petbooking.bookingapp.core.enums.Role;
+import com.petbooking.bookingapp.core.exception.AppAuthenticationException;
 import com.petbooking.bookingapp.core.exception.AppObjectAlreadyExistsException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
 import com.petbooking.bookingapp.core.exception.AppValidationException;
@@ -41,8 +41,8 @@ public class UserService {
         }
 
         //SOS!Ignore any role provided by the user, it should always be set to "USER" for security
-        dto.setRole(Role.USER);
-        //Ignore the user's choice, always account isActive = true
+//        dto.setRole(Role.USER);
+        //SOS!Ignore the user's choice, always account isActive = true
         dto.setIsActive(true);
 
         User user = userMapper.mapToUserEntity(dto);
@@ -91,4 +91,12 @@ public class UserService {
                 .orElseThrow(() -> new AppObjectNotFoundException("USR_", "User with ID " + id + " not found"));
         userRepository.delete(user);
     }
+
+    public UserReadOnlyDTO getMyProfile(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppAuthenticationException("USR_", "User not found"));
+        return userMapper.mapToReadOnlyDTO(user);
+    }
+
+
 }

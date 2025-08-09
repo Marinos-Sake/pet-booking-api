@@ -5,12 +5,11 @@ import com.petbooking.bookingapp.dto.UserInsertDTO;
 import com.petbooking.bookingapp.dto.UserReadOnlyDTO;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.mapper.UserMapper;
-import com.petbooking.bookingapp.security.SecurityUtil;
 import com.petbooking.bookingapp.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,27 +29,33 @@ public class UserController {
         return ResponseEntity.ok(created);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserReadOnlyDTO> getUserById(@PathVariable Long id) {
         UserReadOnlyDTO dto = userService.getUserById(id);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserReadOnlyDTO>> getAllUsers() {
         List<UserReadOnlyDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserReadOnlyDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserInsertDTO dto) {
-        UserReadOnlyDTO updated = userService.updateUser(id, dto);
+    @PutMapping("/me")
+    public ResponseEntity<UserReadOnlyDTO> updateMyProfile(
+            @Valid @RequestBody UserInsertDTO dto,
+            @AuthenticationPrincipal User user) {
+
+        UserReadOnlyDTO updated = userService.updateUser(user.getId(), dto);
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser (@PathVariable Long id) {
-        userService.deleteUser(id);
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyAccount(@AuthenticationPrincipal User user) {
+        userService.deleteUser(user.getId());
         return ResponseEntity.noContent().build();
     }
 

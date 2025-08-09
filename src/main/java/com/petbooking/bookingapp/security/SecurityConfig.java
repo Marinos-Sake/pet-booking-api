@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // Login
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // create user
+                        .requestMatchers(HttpMethod.GET, "/api/reviews").permitAll() // anyone can view reviews
+                        .requestMatchers(HttpMethod.GET,"/api/rooms").permitAll() //anyone can view rooms
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -2,6 +2,7 @@ package com.petbooking.bookingapp.service;
 
 
 import com.petbooking.bookingapp.core.enums.BookingStatus;
+import com.petbooking.bookingapp.core.exception.AppAccessDeniedException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
 import com.petbooking.bookingapp.dto.PaymentInsertDTO;
 import com.petbooking.bookingapp.dto.PaymentReadOnlyDTO;
@@ -27,17 +28,18 @@ public class PaymentService {
 
 
     @Transactional
-    public PaymentReadOnlyDTO addPayment(PaymentInsertDTO dto) {
-        Booking booking = bookingRepository.findById(dto.getBookingId())
+    public PaymentReadOnlyDTO addPayment(PaymentInsertDTO dto, Long userId) {
+        Booking booking = bookingRepository.findByIdAndUserId(dto.getBookingId(), userId)
                 .orElseThrow(() -> new AppObjectNotFoundException("PAY_BOOKING", "Booking not found"));
 
         Payment payment = paymentMapper.mapToPaymentEntity(dto, booking);
         Payment savedPayment = paymentRepository.save(payment);
 
         updateBookingStatusAfterPayment(booking);
-
         return paymentMapper.mapToReadOnlyDTO(savedPayment);
     }
+
+
 
     public List<PaymentReadOnlyDTO> getAllPayments() {
         return paymentRepository.findAll().stream()

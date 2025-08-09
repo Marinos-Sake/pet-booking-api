@@ -62,16 +62,13 @@ public class BookingService {
         return bookingMapper.mapToBookingReadOnlyDTO(saved);
     }
 
-    public BookingReadOnlyDTO getBookingById(Long bookingId,Long userId) {
+    public BookingReadOnlyDTO getBookingById(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_", "Book not found"));
-
-        if (!booking.getUser().getId().equals(userId)) {
-            throw new AppAccessDeniedException("BOOK_", "You don't have access to this booking");
-        }
+                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_", "Booking not found"));
 
         return bookingMapper.mapToBookingReadOnlyDTO(booking);
     }
+
 
     public List<BookingReadOnlyDTO> getAllBookingByUser(Long userId) {
         User user = userRepository.findById(userId)

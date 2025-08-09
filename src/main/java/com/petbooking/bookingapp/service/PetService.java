@@ -64,48 +64,25 @@ public class PetService {
 
     @Transactional
     public PetReadOnlyDTO updatePet(Long petId, PetInsertDTO dto, Long userId) {
-        Pet pet = petRepository.findById(petId)
+        Pet pet = petRepository.findByIdAndOwnerId(petId, userId)
                 .orElseThrow(() -> new AppObjectNotFoundException(
                         "PET_NOT_FOUND",
-                        "Pet with ID " + petId + " not found"));
+                        "Pet with ID " + petId + " not found"
+                ));
 
-        Long actualOwnerId = userRepository.findById(userId)
-                .orElseThrow(() -> new AppObjectNotFoundException(
-                        "PET_USER_NOT_FOUND",
-                        "User with ID " + userId + " not found"))
-                .getPerson().getId();
-
-        if (!pet.getOwner().getId().equals(actualOwnerId)) {
-            throw new AppAccessDeniedException(
-                    "PET_ACCESS_DENIED",
-                    "You do not have permission to modify this pet."
-            );
-        }
         petMapper.updatePetEntityFromDTO(dto, pet);
-        Pet updatedPet = petRepository.save(pet);
-        return petMapper.mapToReadOnlyDTO(updatedPet);
 
+        Pet saved = petRepository.save(pet);
+        return petMapper.mapToReadOnlyDTO(saved);
     }
 
     @Transactional
     public void deletePet(Long petId, Long userId) {
-        Pet pet = petRepository.findById(petId)
+        Pet pet = petRepository.findByIdAndOwnerId(petId, userId)
                 .orElseThrow(() -> new AppObjectNotFoundException(
                         "PET_NOT_FOUND",
-                        "Pet with ID " + petId + " not found"));
-
-        Long actualOwnerId = userRepository.findById(userId)
-                .orElseThrow(() -> new AppObjectNotFoundException(
-                        "PET_USER_NOT_FOUND",
-                        "User with ID " + userId + " not found"))
-                .getPerson().getId();
-
-        if (!pet.getOwner().getId().equals(actualOwnerId)) {
-            throw new AppAccessDeniedException(
-                    "PET_ACCESS_DENIED",
-                    "You do not have permission to delete this pet."
-            );
-        }
+                        "Pet with ID " + petId + " not found"
+                ));
 
         petRepository.delete(pet);
     }

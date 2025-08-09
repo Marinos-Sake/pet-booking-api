@@ -38,6 +38,29 @@ public class JwtUtil {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+    public Date getExpirationDateFromToken(String token) {
+        return parseToken(token).getBody().getExpiration();
+    }
+
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        try {
+            final String username = getUsernameFromToken(token);
+            return username != null
+                    && username.equals(userDetails.getUsername())
+                    && !isTokenExpired(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            return getExpirationDateFromToken(token).before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return true;
+        }
+    }
 
     public String getUsernameFromToken(String token) {
         return parseToken(token).getBody().getSubject();

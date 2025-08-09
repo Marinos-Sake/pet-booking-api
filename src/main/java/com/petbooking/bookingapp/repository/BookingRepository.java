@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
@@ -15,6 +16,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * Returns all bookings associated with the given user.
      */
     List<Booking> findAllByUser(User user);
+
+    Optional<Booking> findByIdAndUserId(Long bookingId, Long userId);
 
 
     /**

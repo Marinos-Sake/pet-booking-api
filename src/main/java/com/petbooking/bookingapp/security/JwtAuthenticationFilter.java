@@ -1,7 +1,5 @@
 package com.petbooking.bookingapp.security;
 
-import com.petbooking.bookingapp.entity.User;
-import com.petbooking.bookingapp.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,39 +18,37 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain)
+                                    FilterChain chain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            chain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
         String username = jwtUtil.getUsernameFromToken(token);
 
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findByUsername(username)
-                    .orElse(null);
+            var userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (user != null && jwtUtil.validateToken(token)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                user, null, user.getAuthorities());
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (jwtUtil.isTokenValid(token, userDetails) && userDetails.isEnabled()) {
+                var auth = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
 }

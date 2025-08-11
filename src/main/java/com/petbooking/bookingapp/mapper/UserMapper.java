@@ -25,7 +25,6 @@ public class UserMapper {
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole());
-        user.setIsActive(dto.getIsActive());
 
         //Nested Person
         user.setPerson(personMapper.mapToPersonEntity(dto.getPerson()));

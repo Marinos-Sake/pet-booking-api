@@ -23,8 +23,6 @@ public class UserInsertDTO {
     @NotNull(message = "Role is required")
     private Role role = Role.USER;
 
-    private Boolean isActive = true;
-
     @NotNull(message = "Person info is required")
     private PersonInsertDTO person;
 }

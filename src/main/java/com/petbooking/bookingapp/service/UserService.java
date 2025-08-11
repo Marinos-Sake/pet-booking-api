@@ -42,8 +42,7 @@ public class UserService {
 
         //SOS!Ignore any role provided by the user, it should always be set to "USER" for security
 //        dto.setRole(Role.USER);
-        //SOS!Ignore the user's choice, always account isActive = true
-        dto.setIsActive(true);
+
 
         User user = userMapper.mapToUserEntity(dto);
         User savedUser = userRepository.save(user);

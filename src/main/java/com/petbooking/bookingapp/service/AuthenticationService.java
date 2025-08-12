@@ -1,6 +1,7 @@
 package com.petbooking.bookingapp.service;
 
 import com.petbooking.bookingapp.core.exception.AppAuthenticationException;
+import com.petbooking.bookingapp.dto.LoginResponseDTO;
 import com.petbooking.bookingapp.repository.UserRepository;
 import com.petbooking.bookingapp.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public String authenticate(String username, String password) {
+    public LoginResponseDTO authenticate(String username, String password) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppAuthenticationException("USR_", "Invalid credentials"));
 
@@ -23,7 +24,9 @@ public class AuthenticationService {
             throw new AppAuthenticationException("PWD_", "Invalid credentials");
         }
 
-        return jwtUtil.generateToken(user);
+        String token = jwtUtil.generateToken(user);
+        return new LoginResponseDTO(token);
     }
+
 }
 

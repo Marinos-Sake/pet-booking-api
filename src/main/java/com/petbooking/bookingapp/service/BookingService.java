@@ -34,6 +34,15 @@ public class BookingService {
 
     @Transactional
     public BookingReadOnlyDTO createBooking(BookingInsertDTO dto, Long userId) {
+        // 1) Domain validation
+        if (dto.getCheckInDate() == null || dto.getCheckOutDate() == null) {
+            throw new AppValidationException("BOOK_DATES", "Both dates are required");
+        }
+        long nights = ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
+        if (nights <= 0) {
+            throw new AppValidationException("BOOK_DATES", "checkOut must be after checkIn");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppObjectNotFoundException("BOOK_USER", "User not found"));
 
@@ -47,20 +56,21 @@ public class BookingService {
         Room room = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new AppObjectNotFoundException("BOOK_ROOM", "Room not found"));
 
-        long nights = ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
-        BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
-
-        Booking booking = bookingMapper.mapToBookingEntity(dto, user, pet, room, totalPrice);
-
-        // Check if room is already booked for these dates
-        if (bookingRepository.existsByRoomIdAndDatesOverlap(dto.getRoomId(), dto.getCheckInDate(), dto.getCheckOutDate())) {
-            throw new AppValidationException("ROOM_UNAVAILABLE", "Room is already booked for the selected dates");
+        if (bookingRepository.existsByRoomIdAndDatesOverlap(
+                dto.getRoomId(), dto.getCheckInDate(), dto.getCheckOutDate())) {
+            throw new AppValidationException("ROOM_UNAVAILABLE",
+                    "Room is already booked for the selected dates");
         }
 
+        //Price
+        BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
 
+        //Map and save
+        Booking booking = bookingMapper.mapToBookingEntity(dto, user, pet, room, totalPrice);
         Booking saved = bookingRepository.save(booking);
         return bookingMapper.mapToBookingReadOnlyDTO(saved);
     }
+
 
     public BookingReadOnlyDTO getBookingById(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)

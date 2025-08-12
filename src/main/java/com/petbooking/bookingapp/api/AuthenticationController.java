@@ -2,6 +2,7 @@ package com.petbooking.bookingapp.api;
 
 
 import com.petbooking.bookingapp.dto.LoginRequestDTO;
+import com.petbooking.bookingapp.dto.LoginResponseDTO;
 import com.petbooking.bookingapp.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,11 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO request) {
-        String token = authenticationService.authenticate(request.getUsername(), request.getPassword());
-        return ResponseEntity.ok(token);
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+        LoginResponseDTO response = authenticationService.authenticate(request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(response);
     }
+
 }
 
 

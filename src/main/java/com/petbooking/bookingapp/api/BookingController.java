@@ -2,7 +2,6 @@ package com.petbooking.bookingapp.api;
 
 import com.petbooking.bookingapp.dto.BookingInsertDTO;
 import com.petbooking.bookingapp.dto.BookingReadOnlyDTO;
-import com.petbooking.bookingapp.entity.Booking;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.service.BookingService;
 import jakarta.validation.Valid;
@@ -44,10 +43,11 @@ public class BookingController {
     }
 
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long id,
-                                              @AuthenticationPrincipal User user) {
-        bookingService.deleteById(id, user.getId());
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        bookingService.deleteById(id, user);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -81,14 +81,18 @@ public class BookingService {
     }
 
     @Transactional
-    public void deleteById(Long bookingId, Long userId) {
+    public void deleteById(Long bookingId, User user) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_", "Book not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_", "Booking not found"));
 
-        if (!booking.getUser().getId().equals(userId)) {
+        boolean isOwner = booking.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.isAdmin();
+
+        if (!isOwner && !isAdmin) {
             throw new AppAccessDeniedException("BOOK_", "You don't have permission to delete this booking");
         }
 
         bookingRepository.delete(booking);
     }
+
 }

@@ -4,6 +4,8 @@ import com.petbooking.bookingapp.core.exception.AppAccessDeniedException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
 import com.petbooking.bookingapp.core.exception.AppValidationException;
 import com.petbooking.bookingapp.dto.BookingInsertDTO;
+import com.petbooking.bookingapp.dto.BookingQuoteRequest;
+import com.petbooking.bookingapp.dto.BookingQuoteResponse;
 import com.petbooking.bookingapp.dto.BookingReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Booking;
 import com.petbooking.bookingapp.entity.Pet;
@@ -103,6 +105,25 @@ public class BookingService {
         }
 
         bookingRepository.delete(booking);
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS) // read-only intent
+    public BookingQuoteResponse getQuote(BookingQuoteRequest req) {
+        if (req.getCheckInDate() == null || req.getCheckOutDate() == null) {
+            throw new AppValidationException("BOOK_QUOTE_DATES", "Both dates are required");
+        }
+
+        long nights = ChronoUnit.DAYS.between(req.getCheckInDate(), req.getCheckOutDate());
+        if (nights <= 0) {
+            throw new AppValidationException("BOOK_QUOTE_DATES", "checkOut must be after checkIn");
+        }
+
+        Room room = roomRepository.findById(req.getRoomId())
+                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_QUOTE_ROOM", "Room not found"));
+
+        BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
+
+        return new BookingQuoteResponse(nights, room.getPricePerNight(), totalPrice);
     }
 
 }

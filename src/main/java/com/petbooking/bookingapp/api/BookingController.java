@@ -1,9 +1,12 @@
 package com.petbooking.bookingapp.api;
 
 import com.petbooking.bookingapp.dto.BookingInsertDTO;
+import com.petbooking.bookingapp.dto.BookingQuoteRequest;
+import com.petbooking.bookingapp.dto.BookingQuoteResponse;
 import com.petbooking.bookingapp.dto.BookingReadOnlyDTO;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.service.BookingService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +51,12 @@ public class BookingController {
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id, @AuthenticationPrincipal User user) {
         bookingService.deleteById(id, user);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @PostMapping("/quote")
+    public ResponseEntity<BookingQuoteResponse> quote(@RequestBody BookingQuoteRequest req) {
+        return ResponseEntity.ok(bookingService.getQuote(req));
     }
 
 }

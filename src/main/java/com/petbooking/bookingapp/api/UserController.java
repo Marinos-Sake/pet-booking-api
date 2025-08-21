@@ -1,6 +1,7 @@
 package com.petbooking.bookingapp.api;
 
 
+import com.petbooking.bookingapp.core.filters.GenericFilters;
 import com.petbooking.bookingapp.dto.UserInsertDTO;
 import com.petbooking.bookingapp.dto.UserReadOnlyDTO;
 import com.petbooking.bookingapp.entity.User;
@@ -8,6 +9,7 @@ import com.petbooking.bookingapp.mapper.UserMapper;
 import com.petbooking.bookingapp.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,9 +40,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UserReadOnlyDTO>> getAllUsers() {
-        List<UserReadOnlyDTO> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<Page<UserReadOnlyDTO>> getAllUsers(@ModelAttribute GenericFilters filters) {
+        return ResponseEntity.ok(userService.getAllForAdmin(filters));
     }
 
     @PutMapping("/me")

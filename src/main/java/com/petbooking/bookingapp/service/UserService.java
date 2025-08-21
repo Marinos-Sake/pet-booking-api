@@ -5,12 +5,14 @@ import com.petbooking.bookingapp.core.exception.AppAuthenticationException;
 import com.petbooking.bookingapp.core.exception.AppObjectAlreadyExistsException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
 import com.petbooking.bookingapp.core.exception.AppValidationException;
+import com.petbooking.bookingapp.core.filters.GenericFilters;
 import com.petbooking.bookingapp.dto.UserInsertDTO;
 import com.petbooking.bookingapp.dto.UserReadOnlyDTO;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.mapper.UserMapper;
 import com.petbooking.bookingapp.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -60,12 +62,11 @@ public class UserService {
         return userMapper.mapToReadOnlyDTO(user);
     }
 
-
-
-    public List<UserReadOnlyDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(userMapper::mapToReadOnlyDTO)
-                .toList();
+    @Transactional(readOnly = true)
+    public Page<UserReadOnlyDTO> getAllForAdmin(GenericFilters filters) {
+        return userRepository
+                .findAll(filters.toPageable())
+                .map(userMapper::mapToReadOnlyDTO);
     }
 
     @Transactional

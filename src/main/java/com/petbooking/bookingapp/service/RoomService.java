@@ -6,7 +6,7 @@ import com.petbooking.bookingapp.dto.RoomReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Room;
 import com.petbooking.bookingapp.mapper.RoomMapper;
 import com.petbooking.bookingapp.repository.RoomRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;

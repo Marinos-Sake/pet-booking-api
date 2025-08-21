@@ -4,6 +4,7 @@ import com.petbooking.bookingapp.core.enums.Gender;
 import com.petbooking.bookingapp.core.enums.PetType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class PetInsertDTO {
     private Double weight;
 
     @NotNull(message = "Birth date is required")
+    @PastOrPresent(message = "Invalid input")
     private LocalDate birthDate;
 
 }

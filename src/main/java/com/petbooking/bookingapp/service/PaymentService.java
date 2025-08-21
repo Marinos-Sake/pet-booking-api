@@ -2,8 +2,8 @@ package com.petbooking.bookingapp.service;
 
 
 import com.petbooking.bookingapp.core.enums.BookingStatus;
-import com.petbooking.bookingapp.core.exception.AppAccessDeniedException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
+import com.petbooking.bookingapp.core.filters.GenericFilters;
 import com.petbooking.bookingapp.dto.PaymentInsertDTO;
 import com.petbooking.bookingapp.dto.PaymentReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Booking;
@@ -11,7 +11,8 @@ import com.petbooking.bookingapp.entity.Payment;
 import com.petbooking.bookingapp.mapper.PaymentMapper;
 import com.petbooking.bookingapp.repository.BookingRepository;
 import com.petbooking.bookingapp.repository.PaymentRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,12 +40,12 @@ public class PaymentService {
         return paymentMapper.mapToReadOnlyDTO(savedPayment);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PaymentReadOnlyDTO> getAllForAdmin(GenericFilters filters) {
+        return paymentRepository
+                .findAll(filters.toPageable())
+                .map(paymentMapper::mapToReadOnlyDTO);
 
-
-    public List<PaymentReadOnlyDTO> getAllPayments() {
-        return paymentRepository.findAll().stream()
-                .map(paymentMapper::mapToReadOnlyDTO)
-                .toList();
     }
 
     private void updateBookingStatusAfterPayment(Booking booking) {

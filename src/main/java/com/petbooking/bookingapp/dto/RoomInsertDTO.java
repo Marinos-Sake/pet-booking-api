@@ -1,6 +1,7 @@
 package com.petbooking.bookingapp.dto;
 
 import com.petbooking.bookingapp.core.enums.RoomType;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,8 @@ public class RoomInsertDTO {
     @NotBlank(message = "Room description is required")
     private String description;
 
+    @NotNull
+    @Column(name = "is_available", nullable = false)
     private Boolean isAvailable = true;
 
     @NotNull(message = "Price per night is required")

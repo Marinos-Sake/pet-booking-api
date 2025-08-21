@@ -1,7 +1,7 @@
 package com.petbooking.bookingapp.service;
 
-import com.petbooking.bookingapp.core.exception.AppAccessDeniedException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
+import com.petbooking.bookingapp.core.exception.AppValidationException;
 import com.petbooking.bookingapp.dto.PetInsertDTO;
 import com.petbooking.bookingapp.dto.PetReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Person;
@@ -10,10 +10,11 @@ import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.mapper.PetMapper;
 import com.petbooking.bookingapp.repository.PetRepository;
 import com.petbooking.bookingapp.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -27,6 +28,13 @@ public class PetService {
 
     @Transactional
     public PetReadOnlyDTO createPet(PetInsertDTO dto, Long userId) {
+
+        if (dto.getBirthDate() != null && dto.getBirthDate().isAfter(LocalDate.now())) {
+            throw new AppValidationException(
+                    "PET_BIRTH",
+                    "The date birth must be in the future"
+            );
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppObjectNotFoundException(
                         "PET_USER_NOT_FOUND",

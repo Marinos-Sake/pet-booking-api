@@ -5,6 +5,7 @@ import com.petbooking.bookingapp.dto.RoomReadOnlyDTO;
 import com.petbooking.bookingapp.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class RoomController {
     @PostMapping
     public ResponseEntity<RoomReadOnlyDTO> createRoom(@Valid @RequestBody RoomInsertDTO dto) {
         RoomReadOnlyDTO created = roomService.createRoom(dto);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping

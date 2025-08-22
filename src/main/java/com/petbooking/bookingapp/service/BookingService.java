@@ -3,10 +3,8 @@ package com.petbooking.bookingapp.service;
 import com.petbooking.bookingapp.core.exception.AppAccessDeniedException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
 import com.petbooking.bookingapp.core.exception.AppValidationException;
-import com.petbooking.bookingapp.dto.BookingInsertDTO;
-import com.petbooking.bookingapp.dto.BookingQuoteRequest;
-import com.petbooking.bookingapp.dto.BookingQuoteResponse;
-import com.petbooking.bookingapp.dto.BookingReadOnlyDTO;
+import com.petbooking.bookingapp.core.filters.GenericFilters;
+import com.petbooking.bookingapp.dto.*;
 import com.petbooking.bookingapp.entity.Booking;
 import com.petbooking.bookingapp.entity.Pet;
 import com.petbooking.bookingapp.entity.Room;
@@ -16,10 +14,10 @@ import com.petbooking.bookingapp.repository.BookingRepository;
 import com.petbooking.bookingapp.repository.PetRepository;
 import com.petbooking.bookingapp.repository.RoomRepository;
 import com.petbooking.bookingapp.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -58,6 +56,12 @@ public class BookingService {
         Room room = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new AppObjectNotFoundException("BOOK_ROOM", "Room not found"));
 
+        // if Available = false
+        if (!Boolean.TRUE.equals(room.getIsAvailable())) {
+            throw new AppValidationException("ROOM_NOT_AVAILABLE",
+                    "The room is unavailable and cannot be booked.");
+        }
+
         if (bookingRepository.existsByRoomIdAndDatesOverlap(
                 dto.getRoomId(), dto.getCheckInDate(), dto.getCheckOutDate())) {
             throw new AppValidationException("ROOM_UNAVAILABLE",
@@ -79,6 +83,12 @@ public class BookingService {
                 .orElseThrow(() -> new AppObjectNotFoundException("BOOK_", "Booking not found"));
 
         return bookingMapper.mapToBookingReadOnlyDTO(booking);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BookingAdminDTOReadOnlyDTO> getAllForAdmin(GenericFilters filters) {
+        return bookingRepository.findAll(filters.toPageable())
+                .map(bookingMapper::toAdminDTO);
     }
 
 
@@ -107,7 +117,7 @@ public class BookingService {
         bookingRepository.delete(booking);
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS) // read-only intent
+    @Transactional(readOnly= true)
     public BookingQuoteResponse getQuote(BookingQuoteRequest req) {
         if (req.getCheckInDate() == null || req.getCheckOutDate() == null) {
             throw new AppValidationException("BOOK_QUOTE_DATES", "Both dates are required");

@@ -7,7 +7,6 @@ import com.petbooking.bookingapp.entity.Attachment;
 import com.petbooking.bookingapp.mapper.AttachmentMapper;
 import com.petbooking.bookingapp.repository.AttachmentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

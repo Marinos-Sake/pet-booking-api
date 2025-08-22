@@ -1,14 +1,13 @@
 package com.petbooking.bookingapp.api;
 
-import com.petbooking.bookingapp.dto.BookingInsertDTO;
-import com.petbooking.bookingapp.dto.BookingQuoteRequest;
-import com.petbooking.bookingapp.dto.BookingQuoteResponse;
-import com.petbooking.bookingapp.dto.BookingReadOnlyDTO;
+import com.petbooking.bookingapp.core.filters.GenericFilters;
+import com.petbooking.bookingapp.dto.*;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.service.BookingService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,12 +40,12 @@ public class BookingController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BookingReadOnlyDTO> getBookingById(@PathVariable Long id) {
-        BookingReadOnlyDTO booking = bookingService.getBookingById(id); // χωρίς userId
+        BookingReadOnlyDTO booking = bookingService.getBookingById(id);
         return ResponseEntity.ok(booking);
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id, @AuthenticationPrincipal User user) {
         bookingService.deleteById(id, user);
@@ -59,4 +58,9 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getQuote(req));
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<BookingAdminDTOReadOnlyDTO>> getAll(@ModelAttribute GenericFilters f) {
+        return ResponseEntity.ok(bookingService.getAllForAdmin(f));
+    }
 }

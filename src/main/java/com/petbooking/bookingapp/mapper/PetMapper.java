@@ -34,6 +34,7 @@ public class PetMapper {
         dto.setGender(pet.getGender());
         dto.setName(pet.getName());
         dto.setWeight(pet.getWeight());
+        dto.setBirthDate(pet.getBirthDate());
 
         // Optional: Owner’s full name (if available)
         if(pet.getOwner() != null) {

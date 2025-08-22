@@ -1,5 +1,6 @@
 package com.petbooking.bookingapp.mapper;
 
+import com.petbooking.bookingapp.dto.BookingAdminDTOReadOnlyDTO;
 import com.petbooking.bookingapp.dto.BookingInsertDTO;
 import com.petbooking.bookingapp.dto.BookingReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Booking;
@@ -50,6 +51,20 @@ public class BookingMapper {
             dto.setPetName(booking.getPet().getName());
         }
 
+        return dto;
+    }
+
+    public BookingAdminDTOReadOnlyDTO toAdminDTO(Booking booking) {
+        BookingAdminDTOReadOnlyDTO dto = new BookingAdminDTOReadOnlyDTO();
+
+        dto.setId(booking.getId());
+        dto.setCheckInDate(booking.getCheckInDate());
+        dto.setCheckOutDate(booking.getCheckOutDate());
+        dto.setStatus(booking.getStatus().name());
+        dto.setTotalPrice(booking.getTotalPrice());
+        dto.setUserId(booking.getUser()!=null ? booking.getUser().getId() : null);
+        dto.setPetId(booking.getPet()!=null ? booking.getPet().getId() : null);
+        dto.setRoomId(booking.getRoom()!=null ? booking.getRoom().getId() : null);
         return dto;
     }
 }

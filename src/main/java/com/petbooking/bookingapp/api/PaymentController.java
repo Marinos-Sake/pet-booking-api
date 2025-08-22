@@ -1,12 +1,14 @@
 package com.petbooking.bookingapp.api;
 
 
+import com.petbooking.bookingapp.core.filters.GenericFilters;
 import com.petbooking.bookingapp.dto.PaymentInsertDTO;
 import com.petbooking.bookingapp.dto.PaymentReadOnlyDTO;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,9 +39,8 @@ public class PaymentController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<PaymentReadOnlyDTO>> getAllPayments() {
-        List<PaymentReadOnlyDTO> payments = paymentService.getAllPayments();
-        return ResponseEntity.ok(payments);
+    public ResponseEntity<Page<PaymentReadOnlyDTO>> getAllPayments(@ModelAttribute GenericFilters filters) {
+        return ResponseEntity.ok(paymentService.getAllForAdmin(filters));
     }
 
     @GetMapping("/my")

@@ -1,5 +1,6 @@
 package com.petbooking.bookingapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.petbooking.bookingapp.core.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class User extends AbstractEntity implements UserDetails {
     private String username;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "is_active", nullable = false)
@@ -42,6 +44,7 @@ public class User extends AbstractEntity implements UserDetails {
     private Person person;
 
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public String getPassword() {
         return password;

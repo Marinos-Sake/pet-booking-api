@@ -1,5 +1,6 @@
 package com.petbooking.bookingapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.petbooking.bookingapp.core.enums.Gender;
 import com.petbooking.bookingapp.core.enums.PetType;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class PetReadOnlyDTO {
 
     private Double weight;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
     private String ownerFullName;

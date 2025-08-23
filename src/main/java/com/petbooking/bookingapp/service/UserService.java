@@ -1,22 +1,22 @@
 package com.petbooking.bookingapp.service;
 
 
-import com.petbooking.bookingapp.core.exception.AppAuthenticationException;
-import com.petbooking.bookingapp.core.exception.AppObjectAlreadyExistsException;
-import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
-import com.petbooking.bookingapp.core.exception.AppValidationException;
+import com.petbooking.bookingapp.core.exception.*;
 import com.petbooking.bookingapp.core.filters.GenericFilters;
 import com.petbooking.bookingapp.dto.UserInsertDTO;
 import com.petbooking.bookingapp.dto.UserReadOnlyDTO;
+import com.petbooking.bookingapp.dto.UserUpdateDTO;
+import com.petbooking.bookingapp.entity.Person;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.mapper.UserMapper;
+import com.petbooking.bookingapp.repository.PersonRepository;
 import com.petbooking.bookingapp.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PersonRepository personRepository;
 
     @Transactional
     public UserReadOnlyDTO createUser(UserInsertDTO dto) {
@@ -70,20 +71,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserReadOnlyDTO updateUser(Long id, UserInsertDTO dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppObjectNotFoundException("USR_", "User with ID " + id + " not found."));
-
-        if (!user.getUsername().equals(dto.getUsername())
-                && userRepository.existsByUsername(dto.getUsername())) {
-            throw new AppObjectAlreadyExistsException("USR_", "Username '" + dto.getUsername() + "' already exists.");
-        }
+    public User updateMyProfile(Long currentUserId, UserUpdateDTO dto) {
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + currentUserId));
 
         userMapper.updateUserEntityFromDTO(dto, user);
-
-        return userMapper.mapToReadOnlyDTO(user);
+        return userRepository.save(user);
     }
-
 
     @Transactional
     public void deleteUser(Long id) {

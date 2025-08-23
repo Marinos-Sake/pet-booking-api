@@ -1,5 +1,6 @@
 package com.petbooking.bookingapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.petbooking.bookingapp.core.enums.Gender;
 import com.petbooking.bookingapp.core.enums.PetType;
 import jakarta.validation.constraints.NotBlank;
@@ -28,8 +29,9 @@ public class PetInsertDTO {
     @NotNull(message = "Weight is required")
     private Double weight;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @NotNull(message = "Birth date is required")
-    @PastOrPresent(message = "Invalid input")
+    @PastOrPresent(message = "The date of birth cannot be in the future.")
     private LocalDate birthDate;
 
 }

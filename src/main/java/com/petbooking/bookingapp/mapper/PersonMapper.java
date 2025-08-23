@@ -2,6 +2,7 @@ package com.petbooking.bookingapp.mapper;
 
 import com.petbooking.bookingapp.dto.PersonInsertDTO;
 import com.petbooking.bookingapp.dto.PersonReadOnlyDTO;
+import com.petbooking.bookingapp.dto.PersonUpdateDTO;
 import com.petbooking.bookingapp.entity.Person;
 import org.springframework.stereotype.Component;
 
@@ -44,17 +45,15 @@ public class PersonMapper {
 
     }
 
-    public void updatePersonEntityFromDTO(PersonInsertDTO dto, Person person) {
+    public void updatePersonEntityFromDTO(PersonUpdateDTO dto, Person person) {
         if (dto == null || person == null) return;
 
-        person.setName(dto.getName());
-        person.setSurname(dto.getSurname());
-        person.setDateOfBirth(dto.getDateOfBirth());
-        person.setPlaceOfBirth(dto.getPlaceOfBirth());
-        person.setFatherName(dto.getFatherName());
-        person.setIdentityNumber(dto.getIdentityNumber());
-        person.setGender(dto.getGender());
+        if (dto.getName() != null) person.setName(dto.getName());
+        if (dto.getSurname() != null) person.setSurname(dto.getSurname());
+        if (dto.getDateOfBirth() != null) person.setDateOfBirth(dto.getDateOfBirth());
+        if (dto.getPlaceOfBirth() != null) person.setPlaceOfBirth(dto.getPlaceOfBirth());
+        if (dto.getFatherName() != null) person.setFatherName(dto.getFatherName());
+        if (dto.getIdentityNumber() != null) person.setIdentityNumber(dto.getIdentityNumber());
+        if (dto.getGender() != null) person.setGender(dto.getGender());
     }
-
-
 }

@@ -34,10 +34,10 @@ Main tables:
 - `users` → authentication and roles
 - `persons` → personal details
 - `pets` → cats or dogs linked to a person
-- `rooms` → available rooms with price and availability
+- `rooms` → rooms with price and availability
 - `bookings` → reservations with total price calculation
 - `payments` → payments linked to bookings with automatic status updates
-- `reviews` → user reviews for completed bookings
+- `reviews` → user reviews for bookings
 - `attachments` → file uploads linked to users
 
 ---
@@ -53,8 +53,7 @@ Main tables:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/pet-booking.git
-   cd pet-booking
+   git clone git@github.com:Marinos-Sake/pet-booking-api.git
 
 2. Configure environment variables:
    Copy `application.yml.sample` to `application.yml`.
@@ -64,6 +63,15 @@ Main tables:
 
 4. API will be available at:
    http://localhost:8080
+
+
+## 📘 API Documentation (Swagger)
+
+The API is documented with Swagger / OpenAPI.
+
+- Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+- OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
 
 ## 🔗 Front-end Repository
 

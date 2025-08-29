@@ -1,5 +1,6 @@
 package com.petbooking.bookingapp.core.filters;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,11 +19,19 @@ public class GenericFilters {
     public static final Sort.Direction DEFAULT_SORT_DIR = Sort.Direction.DESC;
 
 
+    @Schema(description="1-based page index", example="1", minimum="1")
     private Integer page;
+
+    @Schema(description="Items per page (alias: pageSize)", example="10", minimum="1", maximum="100")
     private Integer size;
+
+    @Schema(description="Items per page (alias of size)", example="10", minimum="1", maximum="100")
     private Integer pageSize;
 
+    @Schema(description="Property to sort by", example="id")
     private String sortBy;
+
+    @Schema(description="Sort direction", example="DESC", allowableValues={"ASC","DESC"})
     private Sort.Direction sortDirection;
 
 

@@ -6,7 +6,6 @@ import com.petbooking.bookingapp.core.filters.GenericFilters;
 import com.petbooking.bookingapp.dto.UserInsertDTO;
 import com.petbooking.bookingapp.dto.UserReadOnlyDTO;
 import com.petbooking.bookingapp.dto.UserUpdateDTO;
-import com.petbooking.bookingapp.entity.Person;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.mapper.UserMapper;
 import com.petbooking.bookingapp.repository.PersonRepository;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class UserService {
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new AppObjectAlreadyExistsException(
                     "USR_",
-                    "Username ' " + dto.getUsername() + "' is already exists."
+                    "Username already exists."
             );
         }
 
@@ -43,7 +41,14 @@ public class UserService {
             );
         }
 
-        //SOS!Ignore any role provided by the user, it should always be set to "USER" for security
+        if (personRepository.existsByIdentityNumber(dto.getPerson().getIdentityNumber())) {
+            throw new AppObjectAlreadyExistsException(
+                    "PERSON_",
+                    "This identity number cannot be used."
+            );
+        }
+
+//        SOS!Ignore any role provided by the user, it should always be set to "USER" for security
 //        dto.setRole(Role.USER);
 
 
@@ -57,7 +62,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppObjectNotFoundException(
                         "USR_",
-                        "User with ID " + id + " not found."
+                        "User not found."
                 ));
 
         return userMapper.mapToReadOnlyDTO(user);
@@ -73,7 +78,29 @@ public class UserService {
     @Transactional
     public User updateMyProfile(Long currentUserId, UserUpdateDTO dto) {
         User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + currentUserId));
+                .orElseThrow(() -> new AppObjectNotFoundException("USR_","User not found"));
+
+
+        if (dto.getUsername() != null) {
+            String newUsername = dto.getUsername().trim();
+            if (!newUsername.equalsIgnoreCase(user.getUsername())
+                    && userRepository.existsByUsernameIgnoreCaseAndIdNot(newUsername, user.getId())) {
+                throw new AppObjectAlreadyExistsException("USR_", "Username already exists.");
+            }
+        }
+        
+        if (dto.getPerson() != null && dto.getPerson().getIdentityNumber() != null) {
+            if (user.getPerson() == null) {
+                throw new AppValidationException("USR_", "There is no Person available for update.");
+            }
+            String newIdNum = dto.getPerson().getIdentityNumber().trim();
+            String currentIdNum = user.getPerson().getIdentityNumber();
+            if (!newIdNum.equals(currentIdNum)
+                    && personRepository.existsByIdentityNumberAndIdNot(newIdNum, user.getPerson().getId())) {
+                throw new AppObjectAlreadyExistsException("PERSON_", "This identity number cannot be used.");
+            }
+        }
+
 
         userMapper.updateUserEntityFromDTO(dto, user);
         return userRepository.save(user);
@@ -82,7 +109,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppObjectNotFoundException("USR_", "User with ID " + id + " not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("USR_", "User not found"));
         userRepository.delete(user);
     }
 

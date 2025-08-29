@@ -29,6 +29,12 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    private static final String[] SWAGGER_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -41,10 +47,16 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()  // Login
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // create user
                         .requestMatchers(HttpMethod.GET, "/api/reviews").permitAll() // anyone can view reviews
                         .requestMatchers(HttpMethod.GET,"/api/rooms").permitAll() //anyone can view rooms
+                        .requestMatchers(HttpMethod.GET, "/api/rooms/*/calendar").permitAll() //calendar
+                        .requestMatchers(HttpMethod.POST, "/api/bookings/quote").permitAll()  // quote
+                        .requestMatchers(HttpMethod.GET, "/api/rooms/*").permitAll()   // get room by id
+
+                        // Everything else requires auth
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -17,3 +17,16 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000} # default 1 day
+
+
+# Springdoc - Swagger configuration
+springdoc:
+  swagger-ui:
+    operationsSorter: alpha        # sort endpoints alphabetically
+    tagsSorter: alpha              # sort tags alphabetically
+    displayRequestDuration: true   # show request duration
+    tryItOutEnabled: true          # enable "Try it out" by default
+    filter: true                   # enable search bar
+    docExpansion: none             # start with groups collapsed
+    persistAuthorization: true     # keep JWT token after refresh
+

@@ -10,4 +10,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
 
     Optional<User> findByUsername(String username); //jwt
+
+    boolean existsByUsernameIgnoreCaseAndIdNot(String username, Long id);
+
 }

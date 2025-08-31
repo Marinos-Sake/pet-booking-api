@@ -17,11 +17,14 @@ public class AuthenticationService {
     private final JwtUtil jwtUtil;
 
     public LoginResponseDTO authenticate(String username, String password) {
+
+        //check if user exists
         var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppAuthenticationException("USR_", "Invalid credentials"));
 
+        //check if given password matches the stored (hashed) password
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new AppAuthenticationException("PWD_", "Invalid credentials");
+            throw new AppAuthenticationException("USR_", "Invalid credentials");
         }
 
         String token = jwtUtil.generateToken(user);

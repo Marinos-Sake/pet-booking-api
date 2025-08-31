@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class BookingAdminDTOReadOnlyDTO {
+public class BookingAdminReadOnlyDTO {
 
     private Long id;
     private LocalDate checkInDate;

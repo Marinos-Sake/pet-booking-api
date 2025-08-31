@@ -49,6 +49,12 @@ public class Booking {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
+    // TODO: Reevaluate cascade strategy.
+    // Deleting a Booking currently removes its Payments and Reviews.
+    // Payments should be retained for audits, and Reviews as user feedback.
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 }

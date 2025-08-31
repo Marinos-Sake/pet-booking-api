@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class BookingQuoteRequest {
+public class BookingQuoteRequestDTO {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private Long roomId;

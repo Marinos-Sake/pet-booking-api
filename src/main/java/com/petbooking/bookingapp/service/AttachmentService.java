@@ -2,12 +2,18 @@ package com.petbooking.bookingapp.service;
 
 import com.petbooking.bookingapp.core.exception.AppInvalidInputException;
 import com.petbooking.bookingapp.core.exception.AppObjectNotFoundException;
+import com.petbooking.bookingapp.service.internal.storage.AttachmentStorageInfo;
 import com.petbooking.bookingapp.dto.AttachmentReadOnlyDTO;
 import com.petbooking.bookingapp.entity.Attachment;
+import com.petbooking.bookingapp.entity.Person;
+import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.mapper.AttachmentMapper;
 import com.petbooking.bookingapp.repository.AttachmentRepository;
+import com.petbooking.bookingapp.repository.PersonRepository;
+import com.petbooking.bookingapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,11 +28,14 @@ public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
     private final AttachmentMapper attachmentMapper;
+    private final UserRepository userRepository;
+    private final PersonRepository personRepository;
 
     private final String uploadDir = System.getProperty("user.home") + "/uploads";
 
-    public AttachmentReadOnlyDTO uploadFile(MultipartFile file) {
-        if (file.isEmpty()) {
+    @Transactional
+    public AttachmentReadOnlyDTO uploadIdentityFileForCurrentUser(MultipartFile file, User user) {
+        if (file == null || file.isEmpty()) {
             throw new AppInvalidInputException("ATTACH_", "Uploaded file is empty");
         }
 
@@ -37,21 +46,33 @@ public class AttachmentService {
 
         String originalName = file.getOriginalFilename();
         String extension = getExtension(originalName);
-        String savedName = UUID.randomUUID() + "." + extension;
+        String savedName = UUID.randomUUID() + (extension.isBlank() ? "" : "." + extension);
         Path fullPath = uploadPath.resolve(savedName);
 
         transferFile(file, fullPath);
 
-        Attachment attachment = new Attachment();
-        attachment.setFileName(originalName);
-        attachment.setSavedName(savedName);
-        attachment.setFilePath(fullPath.toString());
-        attachment.setContentType(file.getContentType());
-        attachment.setExtension(extension);
+        AttachmentStorageInfo insertDTO = new AttachmentStorageInfo();
+        insertDTO.setFileName(originalName);
+        insertDTO.setSavedName(savedName);
+        insertDTO.setFilePath(fullPath.toString());
+        insertDTO.setContentType(file.getContentType());
+        insertDTO.setExtension(extension);
 
-        Attachment saved = attachmentRepository.save(attachment);
-        return attachmentMapper.mapToDTO(saved);
+        Attachment toSave = attachmentMapper.mapToAttachmentEntity(insertDTO);
+        Attachment savedAttachment = attachmentRepository.save(toSave);
+
+
+        Person person = user.getPerson();
+        if (person == null) {
+            throw new AppObjectNotFoundException("PERSON_", "Current user has no person profile");
+        }
+
+        person.setIdentityNumberFile(savedAttachment);
+        personRepository.save(person);
+
+        return attachmentMapper.mapToDTO(savedAttachment);
     }
+
 
     public byte[] downloadFile(Long attachmentId) {
         Attachment attachment = attachmentRepository.findById(attachmentId)

@@ -14,7 +14,7 @@ public class AttachmentReadOnlyDTO {
 
     private String fileName;
 
-    private String ContentType;
+    private String contentType;
 
     private String extension;
 

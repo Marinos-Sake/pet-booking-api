@@ -19,7 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -33,42 +36,44 @@ public class BookingService {
     private final BookingMapper bookingMapper;
 
     @Transactional
-    public BookingReadOnlyDTO createBooking(BookingInsertDTO dto, Long userId) {
+    public BookingReadOnlyDTO createBooking(BookingInsertDTO dto, User user) {
+
         // 1) Domain validation
         if (dto.getCheckInDate() == null || dto.getCheckOutDate() == null) {
-            throw new AppValidationException("BOOK_DATES", "Both dates are required");
-        }
-        long nights = ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
-        if (nights <= 0) {
-            throw new AppValidationException("BOOK_DATES", "checkOut must be after checkIn");
+            throw new AppValidationException("BOOK_DATES_", "Both dates are required");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_USER", "User not found"));
+        long nights = ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
+
+        if (nights <= 0) {
+            throw new AppValidationException("BOOK_DATES_", "Check-out date must be after check-in date");
+        }
 
         Pet pet = petRepository.findById(dto.getPetId())
-                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_PET", "Pet not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_PET_", "Pet not found"));
 
         if (!pet.getOwner().getId().equals(user.getPerson().getId())) {
-            throw new AppAccessDeniedException("BOOK_PET_MISMATCH", "You don't own this pet");
+            // Ensure user is booking only with their own pet
+            throw new AppAccessDeniedException("BOOK_PET_MISMATCH_", "You don't own this pet");
         }
 
         Room room = roomRepository.findById(dto.getRoomId())
-                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_ROOM", "Room not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_ROOM_", "Room not found"));
 
-        // if Available = false
+
         if (!Boolean.TRUE.equals(room.getIsAvailable())) {
-            throw new AppValidationException("ROOM_NOT_AVAILABLE",
+            // Check that the room is marked as available before booking
+            throw new AppValidationException("ROOM_NOT_AVAILABLE_",
                     "The room is unavailable and cannot be booked.");
         }
 
         if (bookingRepository.existsByRoomIdAndDatesOverlap(
                 dto.getRoomId(), dto.getCheckInDate(), dto.getCheckOutDate())) {
-            throw new AppValidationException("ROOM_UNAVAILABLE",
+            throw new AppValidationException("ROOM_UNAVAILABLE_",
                     "Room is already booked for the selected dates");
         }
 
-        //Price
+        //Calculate total price = price per night * number of nights
         BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
 
         //Map and save
@@ -86,16 +91,13 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BookingAdminDTOReadOnlyDTO> getAllForAdmin(GenericFilters filters) {
+    public Page<BookingAdminReadOnlyDTO> getAllForAdmin(GenericFilters filters) {
         return bookingRepository.findAll(filters.toPageable())
                 .map(bookingMapper::toAdminDTO);
     }
 
 
-    public List<BookingReadOnlyDTO> getAllBookingByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new AppObjectNotFoundException("BOOK_USER", "User not found"));
-
+    public List<BookingReadOnlyDTO> getAllBookingByUser(User user) {
         return bookingRepository.findAllByUser(user)
                 .stream()
                 .map(bookingMapper::mapToBookingReadOnlyDTO)
@@ -107,33 +109,87 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new AppObjectNotFoundException("BOOK_", "Booking not found"));
 
-        boolean isOwner = booking.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.isAdmin();
-
-        if (!isOwner && !isAdmin) {
-            throw new AppAccessDeniedException("BOOK_", "You don't have permission to delete this booking");
-        }
-
         bookingRepository.delete(booking);
     }
 
     @Transactional(readOnly= true)
-    public BookingQuoteResponse getQuote(BookingQuoteRequest req) {
+    public BookingQuoteResponseDTO getQuote(BookingQuoteRequestDTO req) {
+
         if (req.getCheckInDate() == null || req.getCheckOutDate() == null) {
-            throw new AppValidationException("BOOK_QUOTE_DATES", "Both dates are required");
+            throw new AppValidationException("BOOK_QUOTE_DATES_", "Both dates are required");
         }
 
+        // Compute nights and ensure checkout is strictly after check-in
         long nights = ChronoUnit.DAYS.between(req.getCheckInDate(), req.getCheckOutDate());
         if (nights <= 0) {
-            throw new AppValidationException("BOOK_QUOTE_DATES", "checkOut must be after checkIn");
+            throw new AppValidationException("BOOK_QUOTE_DATES_", "checkOut must be after checkIn");
         }
 
         Room room = roomRepository.findById(req.getRoomId())
-                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_QUOTE_ROOM", "Room not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("BOOK_QUOTE_ROOM_", "Room not found"));
 
+        // Calculate total price = price per night * nights
         BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
 
-        return new BookingQuoteResponse(nights, room.getPricePerNight(), totalPrice);
+        // Return quote with nights, unit price, and total
+        return new BookingQuoteResponseDTO(nights, room.getPricePerNight(), totalPrice);
     }
+
+
+    @Transactional(readOnly = true)
+    public List<CalendarDisabledRangeDTO> getDisabledRangesForRoom(Long roomId, LocalDate from, LocalDate to) {
+        // Validation
+        if (from == null || to == null) {
+            throw new AppValidationException("CAL_DATES_", "Both dates are required");
+        }
+        if (!to.isAfter(from)) {
+            throw new AppValidationException("CAL_DATES_", "to must be after from");
+        }
+
+        // Ensure room exists
+        roomRepository.findById(roomId)
+                .orElseThrow(() -> new AppObjectNotFoundException("CAL_ROOM_", "Room not found"));
+
+        // Fetch overlapping bookings for the given window
+        List<Booking> overlaps = bookingRepository.findOverlaps(roomId, from, to);
+
+        // 5. Map each Booking to a DisabledRangeDTO (unavailable date range)
+        //    - start = check-in date
+        //    - endInclusive = check-out - 1 (because on the check-out day the room becomes available again)
+        List<CalendarDisabledRangeDTO> ranges = overlaps.stream()
+                .map(b -> {
+                    LocalDate start = b.getCheckInDate();
+                    LocalDate endInclusive = b.getCheckOutDate().minusDays(1);
+                    if (endInclusive.isBefore(start)) endInclusive = start;
+                    return new CalendarDisabledRangeDTO(start, endInclusive);
+                })
+                .sorted(Comparator.comparing(CalendarDisabledRangeDTO::getFrom))
+                .toList();
+
+        List<CalendarDisabledRangeDTO> merged = new ArrayList<>();
+        for (CalendarDisabledRangeDTO current : ranges) {
+            // if this is the first interval, add it
+            if (merged.isEmpty()) {
+                merged.add(current);
+                continue;
+            }
+            // Get the last merged interval so far
+            CalendarDisabledRangeDTO last = merged.get(merged.size() - 1);
+
+            // Check if the current interval overlaps or directly touches the last one
+            boolean touchesOrOverlaps = !current.getFrom().isAfter(last.getTo().plusDays(1));
+            if (touchesOrOverlaps) {
+                // Merge them: keep the same 'from' but extend 'to' to the max of both
+                LocalDate newTo = last.getTo().isAfter(current.getTo()) ? last.getTo() : current.getTo();
+                merged.set(merged.size() - 1, new CalendarDisabledRangeDTO(last.getFrom(), newTo));
+            } else {
+                // Otherwise, no overlap -> add as a new independent interval
+                merged.add(current);
+            }
+        }
+
+        return merged;
+    }
+
 
 }

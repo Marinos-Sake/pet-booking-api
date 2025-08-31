@@ -19,7 +19,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findByIdAndUserId(Long bookingId, Long userId);
 
+    boolean existsByPetId(Long petId);
 
+    @Query("""
+SELECT b FROM Booking b
+WHERE b.room.id = :roomId
+  AND b.status IN ('PENDING','CONFIRMED','COMPLETED')
+  AND b.checkInDate < :toDate
+  AND b.checkOutDate > :fromDate
+ORDER BY b.checkInDate
+""")
+    List<Booking> findOverlaps(
+            @Param("roomId") Long roomId,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate
+    );
     /**
      * Checks if a room is already booked (overlapping dates) for the given period.
      * Used to prevent double bookings.

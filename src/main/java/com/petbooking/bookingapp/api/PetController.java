@@ -4,7 +4,9 @@ import com.petbooking.bookingapp.dto.PetInsertDTO;
 import com.petbooking.bookingapp.dto.PetReadOnlyDTO;
 import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.service.PetService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Pet ", description = "Endpoints for managing pets of users")
 @RestController
 @RequestMapping("/api/pets")
 @RequiredArgsConstructor
@@ -20,22 +23,34 @@ public class PetController {
 
     private final PetService petService;
 
+    @Operation(
+            summary = "Create a new pet",
+            description = "Creates a new pet for the authenticated user based on the provided details"
+    )
     @PostMapping
     public ResponseEntity<PetReadOnlyDTO> createPet(
             @RequestBody @Valid PetInsertDTO dto,
             @AuthenticationPrincipal User user
             ) {
-        PetReadOnlyDTO created = petService.createPet(dto, user.getId());
+        PetReadOnlyDTO created = petService.createPet(dto, user);
         return ResponseEntity.ok(created);
     }
 
+    @Operation(
+            summary = "Get my pets",
+            description = "Retrieves all pets that belong to the currently authenticated user"
+    )
     @GetMapping("/my")
     public ResponseEntity<List<PetReadOnlyDTO>> getAllPetsByUserId(
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(petService.getAllPetsByUserId(user.getId()));
+        return ResponseEntity.ok(petService.getAllPetsByUserId(user));
     }
 
+    @Operation(
+            summary = "[ADMIN] Get pet by ID",
+            description = "Retrieves the details of a specific pet by its unique ID."
+    )
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<PetReadOnlyDTO> getPetById(
@@ -44,21 +59,17 @@ public class PetController {
         return ResponseEntity.ok(petService.getPetById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PetReadOnlyDTO> updatePet(
-            @PathVariable Long id,
-            @RequestBody @Valid PetInsertDTO dto,
-            @AuthenticationPrincipal User user
-    ) {
-        return ResponseEntity.ok(petService.updatePet(id, dto, user.getId()));
-    }
 
+    @Operation(
+            summary = "Delete a pet",
+            description = "Deletes a specific pet that belongs to the authenticated user"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePet(
             @PathVariable Long id,
             @AuthenticationPrincipal User user
     ) {
-        petService.deletePet(id, user.getId());
+        petService.deletePet(id, user);
         return ResponseEntity.noContent().build();
     }
 }

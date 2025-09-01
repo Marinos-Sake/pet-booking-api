@@ -42,6 +42,11 @@ public class Room extends AbstractEntity{
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable = true;
 
+
+    // TODO: Review cascade strategy for Room–Booking relationship.
+    // Current setup (cascade = ALL, orphanRemoval = true) means deleting a Room will also delete its Bookings.
+    // From a business perspective, bookings are historical records and should be preserved.
+    // Consider removing cascade REMOVE and orphanRemoval, and instead restrict Room deletion if bookings exist.
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 

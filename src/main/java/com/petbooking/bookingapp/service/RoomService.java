@@ -42,20 +42,17 @@ public class RoomService {
     }
 
     public void deleteRoom(Long id) {
-        if (!roomRepository.existsById(id)) {
-            throw new AppObjectNotFoundException(
-                    "Room_",
-                    "Room not found with ID: " + id
-            );
-        }
-        roomRepository.deleteById(id);
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new AppObjectNotFoundException("ROOM_", "Room not found with ID: " + id));
+        roomRepository.delete(room);
     }
 
     @Transactional
     public void updateAvailability(Long id, boolean isAvailable) {
-        if (!roomRepository.existsById(id)) {
-            throw new AppObjectNotFoundException("Room_", "Room not found with ID: " + id);
-        }
-        roomRepository.updateAvailability(id, isAvailable);
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new AppObjectNotFoundException("ROOM_", "Room not found with ID:" + id));
+
+        room.setIsAvailable(isAvailable);
+        roomRepository.save(room);
     }
 }

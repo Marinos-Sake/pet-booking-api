@@ -53,9 +53,11 @@ public class UserMapper {
     public void updateUserEntityFromDTO(UserUpdateDTO dto, User user) {
         if (dto == null || user == null) return;
 
-        if (hasText(dto.getUsername())) user.setUsername(dto.getUsername().trim());
+        if (dto.getUsername() != null) {
+            user.setUsername(dto.getUsername().trim());
+        }
 
-        if (hasText(dto.getPassword())) {
+        if (dto.getPassword() != null) {
             String raw = dto.getPassword().trim();
             if (user.getPassword() == null || !passwordEncoder.matches(raw, user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(raw));
@@ -69,6 +71,7 @@ public class UserMapper {
             personMapper.updatePersonEntityFromDTO(dto.getPerson(), user.getPerson());
         }
     }
+
 
 
 }

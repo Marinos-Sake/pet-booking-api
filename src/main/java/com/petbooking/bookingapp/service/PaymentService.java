@@ -31,7 +31,7 @@ public class PaymentService {
     @Transactional
     public PaymentReadOnlyDTO addPayment(PaymentInsertDTO dto, Long userId) {
         Booking booking = bookingRepository.findByIdAndUserId(dto.getBookingId(), userId)
-                .orElseThrow(() -> new AppObjectNotFoundException("PAY_BOOKING", "Booking not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("PAY_BOOKING_", "Booking not found"));
 
         Payment payment = paymentMapper.mapToPaymentEntity(dto, booking);
         Payment savedPayment = paymentRepository.save(payment);
@@ -48,6 +48,7 @@ public class PaymentService {
 
     }
 
+    // Helper method to recalculate and update the booking status after a payment
     private void updateBookingStatusAfterPayment(Booking booking) {
         BigDecimal totalPaid = booking.getPayments()
                 .stream()
@@ -67,7 +68,7 @@ public class PaymentService {
 
     public PaymentReadOnlyDTO getPaymentById(Long id) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new AppObjectNotFoundException("PAY_ID", "Payment not found"));
+                .orElseThrow(() -> new AppObjectNotFoundException("PAY_ID_", "Payment not found"));
 
         return paymentMapper.mapToReadOnlyDTO(payment);
     }

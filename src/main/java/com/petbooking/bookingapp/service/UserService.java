@@ -34,13 +34,6 @@ public class UserService {
             );
         }
 
-        if (dto.getPerson() == null) {
-            throw new AppValidationException(
-                    "USR_",
-                    "Person information is required to create user"
-            );
-        }
-
         if (personRepository.existsByIdentityNumber(dto.getPerson().getIdentityNumber())) {
             throw new AppObjectAlreadyExistsException(
                     "PERSON_",
@@ -76,10 +69,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateMyProfile(Long currentUserId, UserUpdateDTO dto) {
-        User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new AppObjectNotFoundException("USR_","User not found"));
-
+    public UserReadOnlyDTO updateMyProfile(User user, UserUpdateDTO dto) {
 
         if (dto.getUsername() != null) {
             String newUsername = dto.getUsername().trim();
@@ -88,7 +78,7 @@ public class UserService {
                 throw new AppObjectAlreadyExistsException("USR_", "Username already exists.");
             }
         }
-        
+
         if (dto.getPerson() != null && dto.getPerson().getIdentityNumber() != null) {
             if (user.getPerson() == null) {
                 throw new AppValidationException("USR_", "There is no Person available for update.");
@@ -101,23 +91,19 @@ public class UserService {
             }
         }
 
-
         userMapper.updateUserEntityFromDTO(dto, user);
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        return userMapper.mapToReadOnlyDTO(saved);
     }
 
     @Transactional
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppObjectNotFoundException("USR_", "User not found"));
-        userRepository.delete(user);
+    public void deleteMe(Long id) {
+        userRepository.deleteById(id);
     }
 
-    public UserReadOnlyDTO getMyProfile(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppAuthenticationException("USR_", "User not found"));
+    @Transactional(readOnly = true)
+    public UserReadOnlyDTO getMyProfile(User user) {
         return userMapper.mapToReadOnlyDTO(user);
     }
-
 
 }

@@ -1,11 +1,10 @@
 package com.petbooking.bookingapp.security;
 
-import com.petbooking.bookingapp.core.exception.AppAuthenticationException;
-import com.petbooking.bookingapp.entity.User;
 import com.petbooking.bookingapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username){
         return userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new AppAuthenticationException("USR_", "User not found with username: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("USR_: User not found: " + username));
     }
 
 

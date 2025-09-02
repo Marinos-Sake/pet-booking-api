@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +35,8 @@ public class PaymentController {
     public ResponseEntity<PaymentReadOnlyDTO> createPayment(
             @Valid @RequestBody PaymentInsertDTO dto,
             @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(paymentService.addPayment(dto, user.getId()));
+        PaymentReadOnlyDTO created = paymentService.addPayment(dto, user.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @Operation(

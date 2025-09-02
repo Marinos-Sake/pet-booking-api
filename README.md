@@ -52,6 +52,8 @@ The API has been tested using two approaches:
    Add automated unit and integration tests for core services and controllers (e.g., authentication, booking flow, payment handling) to ensure back-end stability and reliability.  
    Currently, endpoints are being validated with Postman collections as part of manual testing.
 
+---
+
 ## 📂 Database Schema
 
 Main tables:

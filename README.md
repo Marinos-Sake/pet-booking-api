@@ -27,6 +27,20 @@ This repository contains the **back-end REST API**, built with **Spring Boot 3.4
 
 ---
 
+## Future Improvements
+
+1. **Refine Deletion Logic**  
+   Prevent cascading hard-deletes across related entities. Instead, adopt a safer approach (e.g., soft delete) to preserve historical data such as payments, bookings, and reviews.
+
+2. **Expand CRUD Operations**  
+   Add missing CRUD endpoints or service methods where necessary to provide more complete functionality.
+
+3. **Optimize Security Context**  
+   Avoid loading the entire `User` entity into the security context (due to heavy one-to-one relationships with `Person`). Instead, load only the essential authentication details.
+
+4. **Enhance Error Handling**  
+   Improve the global `ErrorHandler` to provide clearer, more consistent, and developer-friendly error responses across the API.
+
 ## 📂 Database Schema
 
 Main tables:

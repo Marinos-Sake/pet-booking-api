@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +33,7 @@ public class AttachmentController {
             @AuthenticationPrincipal User user
     ) {
         AttachmentReadOnlyDTO dto = attachmentService.uploadIdentityFileForCurrentUser(file, user);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
 

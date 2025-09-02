@@ -27,6 +27,13 @@ This repository contains the **back-end REST API**, built with **Spring Boot 3.4
 
 ---
 
+### 🧪 Testing
+
+The API has been tested using two approaches:
+
+- **Postman collections** to validate endpoints, request/response structures, and authentication flows.
+- **Manual interaction** via Swagger UI** to verify end-to-end scenarios directly against the API.
+
 ## Future Improvements
 
 1. **Refine Deletion Logic**  
@@ -40,6 +47,10 @@ This repository contains the **back-end REST API**, built with **Spring Boot 3.4
 
 4. **Enhance Error Handling**  
    Improve the global `ErrorHandler` to provide clearer, more consistent, and developer-friendly error responses across the API.
+
+5. **Testing Strategy**  
+   Add automated unit and integration tests for core services and controllers (e.g., authentication, booking flow, payment handling) to ensure back-end stability and reliability.  
+   Currently, endpoints are being validated with Postman collections as part of manual testing.
 
 ## 📂 Database Schema
 

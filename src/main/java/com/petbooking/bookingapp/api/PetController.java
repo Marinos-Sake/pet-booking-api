@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Pet ", description = "Endpoints for managing pets of users")
+@Tag(name = "Pet", description = "Endpoints for managing pets of users")
 @RestController
 @RequestMapping("/api/pets")
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class PetController {
             @AuthenticationPrincipal User user
             ) {
         PetReadOnlyDTO created = petService.createPet(dto, user);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @Operation(
@@ -41,7 +42,7 @@ public class PetController {
             description = "Retrieves all pets that belong to the currently authenticated user"
     )
     @GetMapping("/my")
-    public ResponseEntity<List<PetReadOnlyDTO>> getAllPetsByUserId(
+    public ResponseEntity<List<PetReadOnlyDTO>> getMyPets(
             @AuthenticationPrincipal User user
     ) {
         return ResponseEntity.ok(petService.getAllPetsByUserId(user));

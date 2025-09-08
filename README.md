@@ -49,8 +49,7 @@ The API has been tested using two approaches:
    Improve the global `ErrorHandler` to provide clearer, more consistent, and developer-friendly error responses across the API.
 
 5. **Testing Strategy**  
-   Add automated unit and integration tests for core services and controllers (e.g., authentication, booking flow, payment handling) to ensure back-end stability and reliability.  
-   Currently, endpoints are being validated with Postman collections as part of manual testing.
+   Add automated unit and integration tests for core services and controllers (e.g., authentication, booking flow, payment handling) to ensure back-end stability and reliability.
 
 ---
 
